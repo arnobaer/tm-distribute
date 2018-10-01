@@ -22,12 +22,16 @@ import filters.vhdl
 
 __version__ = '0.0.6'
 
-def cut_data_lut(data):
-    """Returns list of cut data values.
-    >>> cut_data_lut('0,2,3')
-    [0, 2, 3]
+def cut_data_lut(size, data):
+    """Returns utm's LUT cut data values.
+    >>> cut_data_lut(4, '13')
+    Lut<[true, false, true, true]>
     """
-    return [int(value.strip()) for value in data.split(',')]
+    data = int(data.strip())
+    result = Lut(False, size)
+    for i in range(size):
+        result[i] = bool((data >> i) & 0x1)
+    return result
 
 class Range(object):
     """Range object with C99/C++98 compliant initalizer list string representation."""
@@ -54,6 +58,8 @@ class Lut(object):
     def __getitem__(self, key):
         return self.values[key]
     def __setitem__(self, key, value):
+        if key >= len(self.values):
+            print key, value, self.values
         self.values[key] = value
     def __len__(self):
         return len(self.values)
@@ -167,13 +173,9 @@ class ObjectHelper(object):
             elif type_ == tmEventSetup.Phi:
                 self.phi.append(Range(cut.getMinimum().index, cut.getMaximum().index))
             elif type_ == tmEventSetup.Isolation:
-                self.isolationLUT = Lut(False, 4)
-                for key in cut_data_lut(cut.getData()):
-                    self.isolationLUT[key] = True
+                self.isolationLUT = cut_data_lut(len(self.isolationLUT), cut.getData())
             elif type_ == tmEventSetup.Quality:
-                self.qualityLUT = Lut(False, 16)
-                for key in cut_data_lut(cut.getData()):
-                    self.qualityLUT[key] = True
+                self.qualityLUT = cut_data_lut(len(self.qualityLUT), cut.getData())
             elif type_ == tmEventSetup.Charge:
                 self.charge = charge_encode(cut.getData())
     def _init_cent(self, handle):
