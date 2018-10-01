@@ -223,12 +223,20 @@ class ConditionHelper(object):
         tmEventSetup.Centrality7: SignalType,
         tmEventSetup.Externals: SignalType,
     }
+    ChargeCorrelationTypes = {
+        'ls': 'LS',
+        'os': 'OS',
+    }
     def __init__(self, handle):
         self.name = filters.generic.snakecase(handle.getName())
         self.type = self.Types[handle.getType()]
         self.objects = []
         for object_ in handle.getObjects():
             self.objects.append(ObjectHelper(object_))
+        self.charge_correlation = None
+        for cut in handle.getCuts():
+            if cut.getCutType() == tmEventSetup.ChargeCorrelation:
+                self.charge_correlation = self.ChargeCorrelationTypes[cut.getData()]
 
 class SeedHelper(object):
     Operators = {
