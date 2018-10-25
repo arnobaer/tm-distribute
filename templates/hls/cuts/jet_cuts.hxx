@@ -1,5 +1,5 @@
 {% block code %}
-const gtl::cut::{{ c.objects[0].type }} {{ c.name }}[{{ c.objects|count }}] = {
+const gtl::utils::array<gtl::cut::{{ c.objects[0].type }}, {{ c.objects|count }}> {{ c.name }} = { {
 {%- for o in c.objects %}
     {
         .n_cuts={{ c.objects|count }},
@@ -12,5 +12,5 @@ const gtl::cut::{{ c.objects[0].type }} {{ c.name }}[{{ c.objects|count }}] = {
         .n_phi={{ o.phi|count }},
     },
 {%- endfor %}
-};
+} };
 {% endblock code %}
